@@ -7,6 +7,9 @@ import java.io.*;
 import java.nio.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import javax.mail.*;
+import javax.mail.internet.*;
+import javax.activation.*;
 
 public class ordertaker extends JFrame {
 	/* variables for model & elements */
@@ -150,6 +153,16 @@ public class ordertaker extends JFrame {
 			}
 		});
 		
+		JMenuItem help2email = new JMenuItem("E-Mail");
+		help2email.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				String user = JOptionPane.showInputDialog("Who is deleting?");
+				String recipientEmail = JOptionPane.showInputDialog("Enter your e-mail address:");
+				sendEmail(recipientEmail);
+			}
+		});
+		
 		JMenuItem file2open = new JMenuItem("Open");
 		JMenuItem file2savelog = new JMenuItem("Save logfile");
 		file2savelog.addActionListener(new ActionListener() {
@@ -170,6 +183,8 @@ public class ordertaker extends JFrame {
 		file.add(file2open);
 		file.add(file2savelog);
 		file.add(file2exit);
+		help.add(help2email);
+		exit.add(file2exit);
 		
 		menubar.add(file);
 		menubar.add(edit);
@@ -178,7 +193,28 @@ public class ordertaker extends JFrame {
 		
 		setJMenuBar(menubar);
 	}
-	
+	/* method for sending email to creator */
+	public void sendEmail(String recipientEmail) {
+		String to = "matt.knouff@mkdesignsoftware.com";
+		String from = recipientEmail;
+		String host = "localhost";
+		Properties properties = System.getProperties();
+		properties.setProperty("mail.smtp.host", host);
+		Session session = Session.getDefaultInstance(properties);
+		try { 
+			MimeMessage message = new MimeMessage(session);
+			message.setFrom(new InternetAddress(from));
+			message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+			String subject = JOptionPane.showInputDialog("Subject:");
+			message.setSubject(subject);
+			String comment = JOptionPane.showInputDialog("Comments:");
+			message.setText(comment);
+			Transport.send(message);
+		}
+		catch (MessagingException mex) {
+			mex.printStackTrace();
+		}
+	}
 	/* will verify that name is correctly used & will verify against a password - not implemented yet */
 	public boolean verifyName(String name) {
 			return true;
